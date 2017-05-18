@@ -34,3 +34,13 @@ $params = array(
     'scope'         => 'email,user_birthday'
 );
 echo $link = '<p><a href="' . $url . '?' . urldecode(http_build_query($params)) . '">Аутентификация через Facebook</a></p>';
+
+
+$url = 'https://accounts.google.com/o/oauth2/auth';
+$params = array(
+    'redirect_uri'  => "http://localhost/GraduateWork/google.php",
+    'response_type' => 'code',
+    'client_id'     => "826057968516-cikh39okvmei2hojokpaciv2lcm16oop.apps.googleusercontent.com",
+    'scope'         => 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'
+);
+echo $link = '<p><a href="' . $url . '?' . urldecode(http_build_query($params)) . '">Аутентификация через Google</a></p>';

@@ -84,17 +84,7 @@ if (isset($_GET['code'])) {
     $tokenInfo = json_decode($result, true);
 }
 
-if (isset($tokenInfo['access_token']) && isset($public_key)) {
-    $sign = md5("application_key={$public_key}format=jsonmethod=users.getCurrentUser" . md5("{$tokenInfo['access_token']}{$client_secret}"));
 
-    $params = array(
-        'method'          => 'users.getCurrentUser',
-        'access_token'    => $tokenInfo['access_token'],
-        'application_key' => $public_key,
-        'format'          => 'json',
-        'sig'             => $sign
-    );
-}
 if (isset($tokenInfo['access_token']) && isset($public_key)) {
     $sign = md5("application_key={$public_key}format=jsonmethod=users.getCurrentUser" . md5("{$tokenInfo['access_token']}{$client_secret}"));
 
@@ -121,21 +111,6 @@ if (isset($tokenInfo['access_token']) && isset($public_key)) {
 
     $result = pg_query($pg_con, "SELECT id_user FROM myschema.users WHERE social_id='$user_social_id'");
     $query->add_record(pg_fetch_row($result)[0]);
-
-}
-if (isset($tokenInfo['access_token']) && isset($public_key)) {
-    $sign = md5("application_key={$public_key}format=jsonmethod=users.getCurrentUser" . md5("{$tokenInfo['access_token']}{$client_secret}"));
-
-    $params = array(
-        'method'          => 'users.getCurrentUser',
-        'access_token'    => $tokenInfo['access_token'],
-        'application_key' => $public_key,
-        'format'          => 'json',
-        'sig'             => $sign
-    );
-    $userJson = file_get_contents('http://api.odnoklassniki.ru/fb.do' . '?' . urldecode(http_build_query($params)));
-    $userInfo = json_decode($userJson, true);
-
     if (isset($userInfo['uid'])) {
         $result = true;
     }
@@ -143,7 +118,6 @@ if (isset($tokenInfo['access_token']) && isset($public_key)) {
         $_SESSION['user'] = $userInfo;
         header('Location: content.php');
     }
-
 }
 */
 
@@ -176,8 +150,9 @@ if (isset($_GET['code'])) {
             'access_token' => $tokenInfo['access_token']
         );
         $url = 'https://graph.facebook.com/v2.9/me?';;
+        $json_fb = file_get_contents($url.urldecode(http_build_query($params)));
+        $userInfo=json_decode($json_fb,true);
 
-        $userInfo=json_decode(file_get_contents($url.urldecode(http_build_query($params))),true);
         $db = database::get_instance();
         $pg_con = $db->get_connection();
         $user_social_id = $userInfo['id'].'';
@@ -186,7 +161,7 @@ if (isset($_GET['code'])) {
         $result = pg_query($pg_con, "SELECT id_user FROM myschema.users WHERE social_id='$user_social_id'");
         $query = new query($pg_con);
         if (!pg_fetch_row($result)) {
-            $query->add_user($userInfo['id'], $userInfo['first_name'], $userInfo['last_name'], $json_ok);
+            $query->add_user($userInfo['id'], $userInfo['first_name'], $userInfo['last_name'], $json_fb);
         }
 
         $result = pg_query($pg_con, "SELECT id_user FROM myschema.users WHERE social_id='$user_social_id'");
