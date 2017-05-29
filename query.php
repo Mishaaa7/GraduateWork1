@@ -8,9 +8,9 @@ class query
         $this->pg_con = $pg_con;
     }
 
-    function add_user ($social_id, $first_name, $last_name, $user_json, $email = NULL, $telefon = NULL) {
-        pg_prepare($this->pg_con, "new_user", 'INSERT INTO myschema.users(social_id, firstname, surname, email, telefon, social) VALUES ($1, $2, $3, $4, $5, $6)');
-        pg_execute($this->pg_con, "new_user", array($social_id, $first_name, $last_name, $email, $telefon, $user_json));
+    function add_user ($social_id, $first_name, $last_name, $user_json, $email = NULL, $social_type, $telefon = NULL, $id_place = NULL) {
+        pg_prepare($this->pg_con, "new_user", 'INSERT INTO myschema.users(social_id, firstname, surname, email, telefon, social, social_type, id_place) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)');
+        pg_execute($this->pg_con, "new_user", array($social_id, $first_name, $last_name, $email, $telefon, $user_json, $social_type, $id_place));
     }
 
     function add_record ($id_user) {

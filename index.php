@@ -1,181 +1,82 @@
 <?php
-
 if (!isset($_SESSION))session_start();
-function autoload($class) {
-    require_once(strtolower($class).".php");
+if (isset($_GET['do']) && $_GET['do']=='logout') {
+    unset($_SESSION['user']);
+    session_destroy();
 }
-spl_autoload_register('autoload');
+if (!$_SESSION['user']) {
+    header("Location: auth.php");
+    exit();
+}?>
+<!DOCTYPE html>
+<html lang="en" ng-app="MyApp" ng-controller="appCtrl as app" >
 
-//vk
-/*
-$app_id = '5883776';
-$secure_key = 'LyQLATLlYVfYjfqkKgaW';
-$url = 'http://localhost/GraduateWork';
-if (isset($_GET['code'])) {
+<head>
+	<meta charset="UTF-8">
+	<title>K504</title>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
 
-    $params = array(
-        'client_id' => $app_id,
-        'client_secret' => $secure_key,
-        'redirect_uri' => $url,
-        'code' => $_GET['code']
-    );
-    $token = json_decode(file_get_contents('https://oauth.vk.com/access_token' . '?' . urldecode(http_build_query($params))), true);
+</head>
 
-    if (isset($token['access_token'])) {
-        $params = array(
-            'uids'         => $token['user_id'],
-            'fields'       => 'uid,verified,first_name,last_name,city,country,home_town,education,schools,screen_name,sex,bdate,photo_50',
-            'access_token' => $token['access_token']
-        );
+<body layout="row" layout-fill>
+	<md-sidenav class="md-sidenav-left" layout="column" md-component-id="left" md-whiteframe="4" md-is-locked-open="$mdMedia('gt-md')">
+		<md-toolbar class="md-tall" layout="row">
+			<div class="md-toolbar-tools">
+				<h2 flex>Навигация</h2>
 
-        $json_vk = file_get_contents('https://api.vk.com/method/users.get' . '?' . urldecode(http_build_query($params)));
-        $userInfo = json_decode($json_vk, true);
+				<md-button class="md-icon-button" ng-click="app.toogleLeftSidenav()" hide-gt-md aria-label="More">
+					<md-icon md-svg-icon="node_modules/material-design-icons/navigation/svg/production/ic_arrow_back_48px.svg"></md-icon>
+				</md-button>
+			</div>
+		</md-toolbar>
+		<md-content>
+			<md-list>
+                <md-list-item ui-sref="info">
+					<md-icon md-svg-icon="node_modules/material-design-icons/action/svg/production/ic_info_48px.svg"></md-icon>
+					<p>О специальности</p>
+				</md-list-item>
+				<md-list-item ui-sref="list">
+					<md-icon md-svg-icon="node_modules/material-design-icons/action/svg/production/ic_list_48px.svg"></md-icon>
+					<p>Дисциплины</p>
+				</md-list-item>
+                <md-list-item ui-sref="map">
+					<md-icon md-svg-icon="node_modules/material-design-icons/maps/svg/production/ic_place_48px.svg"></md-icon>
+					<p>Как нас найти</p>
+				</md-list-item>
+				<!-- <md-list-item ui-sref="profile">
+					<md-icon md-svg-icon="../node_modules/material-design-icons/action/svg/production/ic_account_circle_48px.svg"></md-icon>
+					<p>Профиль</p>
+				</md-list-item>
+				<md-list-item ui-sref="settings">
+					<md-icon md-svg-icon="../node_modules/material-design-icons/action/svg/production/ic_settings_48px.svg"></md-icon>
+					<p>Настройки</p>
+				</md-list-item> -->
+                <md-list-item ui-sref="">
+                    <md-icon md-svg-icon="node_modules/material-design-icons/action/svg/production/ic_exit_to_app_48px.svg"></md-icon>
+                    <p><?php echo "<a href='auth.php?do=logout'>Выход</a>";?></p>
+                </md-list-item>
+			</md-list>
+		</md-content>
+	</md-sidenav>
 
-        if (isset($userInfo['response'][0]['uid'])) {
-            $userInfo = $userInfo['response'][0];
-            $result = true;
-            $db = database::get_instance();
-            $pg_con = $db->get_connection();
-            $user_social_id = $userInfo['uid'].'';
+	<div layout="column" class="relative" layout-fill role="main" ui-view>
+		<!-- here is template content -->
+	</div>
+</body>
 
-            $result = pg_query($pg_con, "SELECT id_user FROM myschema.users WHERE social_id='$user_social_id'");
-            $query = new query($pg_con);
-            if (!pg_fetch_row($result)) {
-                $query->add_user($userInfo['uid'], $userInfo['first_name'], $userInfo['last_name'], $json_vk);
-            }
-                $result = pg_query($pg_con, "SELECT id_user FROM myschema.users WHERE social_id='$user_social_id'");
-                $query->add_record(pg_fetch_row($result)[0]);
-        }
-        if ($result) {
-            $_SESSION['user'] = $userInfo;
-            header('Location: content.php');
-        }
-    }
-}
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
 
+<script src="http://angular-ui.github.io/ui-router/release/angular-ui-router.js"></script>
 
+<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
 
-$client_id = '1249921792'; // Application ID
-$public_key = 'CBAMEBILEBABABABA'; // Публичный ключ приложения
-$client_secret = '73BFE05637B1C8A88659B3D7'; // Секретный ключ приложения
-$redirect_uri = 'http://localhost/GraduateWork'; // Ссылка на приложение
+<script src="js/disciplineListCtrl.js"></script>
+<script src="js/disciplineFilter.js"></script>
+<script src="js/mapCtrl.js"></script>
+<script src="js/appCtrl.js"></script>
+<script src="js/app.js"></script>
 
-if (isset($_GET['code'])) {
-
-    $params = array(
-        'code' => $_GET['code'],
-        'redirect_uri' => $redirect_uri,
-        'grant_type' => 'authorization_code',
-        'client_id' => $client_id,
-        'client_secret' => $client_secret
-    );
-
-    $url = 'http://api.odnoklassniki.ru/oauth/token.do';
-
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, $url); // url, куда будет отправлен запрос
-    curl_setopt($curl, CURLOPT_POST, 1);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, urldecode(http_build_query($params))); // передаём параметры
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    $result = curl_exec($curl);
-    curl_close($curl);
-
-    $tokenInfo = json_decode($result, true);
-}
-
-
-if (isset($tokenInfo['access_token']) && isset($public_key)) {
-    $sign = md5("application_key={$public_key}format=jsonmethod=users.getCurrentUser" . md5("{$tokenInfo['access_token']}{$client_secret}"));
-
-    $params = array(
-        'method'          => 'users.getCurrentUser',
-        'access_token'    => $tokenInfo['access_token'],
-        'application_key' => $public_key,
-        'format'          => 'json',
-        'sig'             => $sign
-    );
-    $json_ok = file_get_contents('http://api.odnoklassniki.ru/fb.do' . '?' . urldecode(http_build_query($params)));
-    $userInfo = json_decode($json_ok, true);
-
-    $db = database::get_instance();
-    $pg_con = $db->get_connection();
-    $user_social_id = $userInfo['uid'].'';
-
-
-    $result = pg_query($pg_con, "SELECT id_user FROM myschema.users WHERE social_id='$user_social_id'");
-    $query = new query($pg_con);
-    if (!pg_fetch_row($result)) {
-        $query->add_user($userInfo['uid'], $userInfo['first_name'], $userInfo['last_name'], $json_ok);
-    }
-
-    $result = pg_query($pg_con, "SELECT id_user FROM myschema.users WHERE social_id='$user_social_id'");
-    $query->add_record(pg_fetch_row($result)[0]);
-    if (isset($userInfo['uid'])) {
-        $result = true;
-    }
-    if ($result) {
-        $_SESSION['user'] = $userInfo;
-        header('Location: content.php');
-    }
-}
-*/
-
-//facebook
-
-$client_id = '176216536202399'; // Client ID
-$client_secret = 'b4df154120290969e3c23a2f3253f6e6'; // Client secret
-$redirect_uri = 'http://localhost/GraduateWork'; // Redirect URIs
-
-$url = 'https://www.facebook.com/v2.9/dialog/oauth';
-if (isset($_GET['code'])) {
-    echo $_GET['code'];
-    $result = false;
-
-    $params = array(
-        'client_id'     => $client_id,
-        'redirect_uri'  => $redirect_uri,
-        'client_secret' => $client_secret,
-        'code'          => $_GET['code']
-    );
-
-    $url = 'https://graph.facebook.com/v2.9/oauth/access_token';
-
-    $tokenInfo = null;
-    $tokenInfo = json_decode(file_get_contents($url . '?' . http_build_query($params)), true);
-
-    if (count($tokenInfo) > 0 && isset($tokenInfo['access_token'])) {
-        $params = array(
-            'fields' => 'id,name,first_name,last_name,email,birthday,devices,education', //https://developers.facebook.com/docs/graph-api/reference/v2.3/user
-            'access_token' => $tokenInfo['access_token']
-        );
-        $url = 'https://graph.facebook.com/v2.9/me?';;
-        $json_fb = file_get_contents($url.urldecode(http_build_query($params)));
-        $userInfo=json_decode($json_fb,true);
-
-        $db = database::get_instance();
-        $pg_con = $db->get_connection();
-        $user_social_id = $userInfo['id'].'';
-
-
-        $result = pg_query($pg_con, "SELECT id_user FROM myschema.users WHERE social_id='$user_social_id'");
-        $query = new query($pg_con);
-        if (!pg_fetch_row($result)) {
-            $query->add_user($userInfo['id'], $userInfo['first_name'], $userInfo['last_name'], $json_fb);
-        }
-
-        $result = pg_query($pg_con, "SELECT id_user FROM myschema.users WHERE social_id='$user_social_id'");
-        $query->add_record(pg_fetch_row($result)[0]);
-        if (isset($userInfo['id'])) {
-            $userInfo = $userInfo;
-            $result = true;
-        }
-    }
-
-    if ($result) {
-        $_SESSION['user'] = $userInfo;
-        header('Location: content.php');
-    }
-}
-
-
+</html>

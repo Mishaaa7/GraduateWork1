@@ -7,13 +7,13 @@
  */
 if (!isset($_SESSION))session_start();
 function autoload($class) {
-    require_once(strtolower($class).".php");
+    require_once("../".strtolower($class).".php");
 }
 spl_autoload_register('autoload');
 
 $client_id = "826057968516-cikh39okvmei2hojokpaciv2lcm16oop.apps.googleusercontent.com";
 $client_secret = "4PvUhrjH7xiChj-RDmqztSFL";
-$redirect_uri = "http://localhost/GraduateWork/google.php";
+$redirect_uri = "http://localhost/GraduateWork/API/google.php";
 
 if (isset($_GET['code'])) {
     $result = false;
@@ -52,7 +52,7 @@ if (isset($_GET['code'])) {
             $result = pg_query($pg_con, "SELECT id_user FROM myschema.users WHERE social_id='$user_social_id'");
             $query = new query($pg_con);
             if (!pg_fetch_row($result)) {
-                $query->add_user($userInfo['id'], $userInfo['given_name'], $userInfo['family_name'], $json_google, $userInfo['email']);
+                $query->add_user($userInfo['id'], $userInfo['given_name'], $userInfo['family_name'], $json_google, $userInfo['email'], 'google');
             }
             $result = pg_query($pg_con, "SELECT id_user FROM myschema.users WHERE social_id='$user_social_id'");
             $query->add_record(pg_fetch_row($result)[0]);
@@ -65,7 +65,7 @@ if (isset($_GET['code'])) {
     }
     if ($result) {
         $_SESSION['user'] = $userInfo;
-        header('Location: content.php');
+        header('Location: ../index.php');
     }
 }
 
