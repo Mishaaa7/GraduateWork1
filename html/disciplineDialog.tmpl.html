@@ -1,0 +1,36 @@
+<md-dialog aria-label="List dialog">
+	<md-dialog-content>
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>{{ DialogCtrl.name }}</h2>
+			</div>
+		</md-toolbar>
+		<md-tabs md-dynamic-height md-border-bottom>
+			<md-tab label="Студент будет знать">
+				<md-content class="md-padding">
+					<md-list>
+						<md-list-item ng-repeat="item in DialogCtrl.willKnow">
+							<p>- {{item}}</p>
+						</md-list-item>
+					</md-list>
+				</md-content>
+			</md-tab>
+			<md-tab label="Студент будет уметь">
+				<md-content class="md-padding">
+					<md-list>
+						<md-list-item ng-repeat="item in DialogCtrl.willBeAble">
+							<p>- {{item}}</p>
+						</md-list-item>
+					</md-list>
+				</md-content>
+			</md-tab>
+		</md-tabs>
+	</md-dialog-content>
+	<md-dialog-actions layout="row" layout-align="space-between center">
+        <md-icon-button ng-click="DialogCtrl.likeIt()" style="outline:none">
+            <md-icon md-svg-src="{{ DialogCtrl.favoriteIcon.current }}"></md-icon>
+        </md-icon-button>
+		<md-button ng-click="DialogCtrl.closeDialog()" class="md-primary"> Закрыть
+		</md-button>
+	</md-dialog-actions>
+</md-dialog>
